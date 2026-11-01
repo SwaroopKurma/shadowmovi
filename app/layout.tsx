@@ -19,8 +19,8 @@ const body = IBM_Plex_Sans({
 });
 
 export const metadata: Metadata = {
-  title: 'OpenTorrent Catalog',
-  description: 'Open-source movie catalog with instant & WebTorrent streaming',
+  title: 'Shadow-Movi',
+  description: 'Open-source movie streaming platform with instant & WebTorrent playback',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -37,7 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               className="flex items-center gap-2 rounded-ui font-display text-lg font-semibold tracking-tight transition-colors hover:text-leader"
             >
               <span aria-hidden className="size-3 rounded-[2px] bg-leader" />
-              opentorrent
+              Shadow-Movi
             </Link>
             <Suspense fallback={<div className="h-10 w-full max-w-sm" />}>
               <SearchBar />

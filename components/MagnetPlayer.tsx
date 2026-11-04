@@ -9,19 +9,17 @@ interface Props {
   title?: string;
 }
 
+// Cleaned up server list: prioritizing 2Embed and regional-friendly alternatives
 const SERVERS = [
-  { id: 'vidlink', name: 'Server 1 (VidLink)', getUrl: (tmdb: string) => `https://vidlink.pro/movie/${tmdb}` },
-  { id: 'vidsrccc', name: 'Server 2 (VidSrc CC)', getUrl: (tmdb: string) => `https://vidsrc.cc/v2/embed/movie/${tmdb}` },
-  { id: 'embedsu', name: 'Server 3 (Embed.su)', getUrl: (tmdb: string) => `https://embed.su/embed/movie/${tmdb}` },
-  { id: 'autoembed', name: 'Server 4 (AutoEmbed)', getUrl: (tmdb: string) => `https://player.autoembed.cc/embed/movie/${tmdb}` },
-  { id: 'multiembed', name: 'Server 5 (SuperEmbed)', getUrl: (tmdb: string) => `https://multiembed.mov/?video_id=${tmdb}&tmdb=1` },
-  { id: 'vidsrcdev', name: 'Server 6 (VidSrc Dev)', getUrl: (tmdb: string) => `https://vidsrc.dev/embed/movie/${tmdb}` },
-  { id: 'vidsrcvip', name: 'Server 7 (VidSrc VIP)', getUrl: (tmdb: string) => `https://vidsrc.vip/embed/movie/${tmdb}` },
-  { id: '2embed', name: 'Server 8 (2Embed)', getUrl: (tmdb: string) => `https://www.2embed.cc/embed/${tmdb}` },
+  { id: '2embed', name: 'Server 1 (2Embed)', getUrl: (tmdb: string) => `https://www.2embed.cc/embed/${tmdb}` },
+  { id: 'yapgrid', name: 'Server 2 (YapGrid)', getUrl: (tmdb: string) => `https://yapgrid.com/embed/movie/${tmdb}` },
+  { id: 'superembed', name: 'Server 3 (SuperEmbed)', getUrl: (tmdb: string) => `https://multiembed.mov/?video_id=${tmdb}&tmdb=1` },
+  { id: 'embedsu', name: 'Server 4 (Embed.su)', getUrl: (tmdb: string) => `https://embed.su/embed/movie/${tmdb}` }
 ];
 
 export default function MagnetPlayer({ tmdbId, imdbId, magnet, title }: Props) {
-  const [activeServer, setActiveServer] = useState<string>(SERVERS[7].id);
+  // Defaulting to 2Embed
+  const [activeServer, setActiveServer] = useState<string>(SERVERS[0].id);
   const [customMagnet, setCustomMagnet] = useState(magnet || '');
   const [status, setStatus] = useState('Ready to stream via WebTorrent.');
   const [stats, setStats] = useState('');
@@ -73,7 +71,7 @@ export default function MagnetPlayer({ tmdbId, imdbId, magnet, title }: Props) {
     client.on('error', (err: any) => setStatus(`Torrent Error: ${err.message}`));
   };
 
-useEffect(() => {
+  useEffect(() => {
     if (activeServer === 'torrent' && customMagnet) {
       startTorrent(customMagnet);
     }
@@ -88,8 +86,7 @@ useEffect(() => {
     };
   }, [activeServer]);
 
-
-   const currentEmbed = SERVERS.find((s) => s.id === activeServer);
+  const currentEmbed = SERVERS.find((s) => s.id === activeServer);
   const encodedTitle = encodeURIComponent(title || 'movie');
 
   return (

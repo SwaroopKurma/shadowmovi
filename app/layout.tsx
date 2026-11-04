@@ -28,7 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${display.variable} ${body.variable}`}>
 	<head>
-  <Script src="https://a15sn.com/tag.min.js" data-zone="12188543" strategy="afterInteractive" />
+  <script dangerouslySetInnerHTML={{ __html: `(function(s){s.dataset.zone='12188543',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))` }} />
   <Script src="https://cdn.jsdelivr.net/npm/webtorrent@latest/webtorrent.min.js" strategy="afterInteractive" />
 </head>
     <body className="min-h-screen font-body">

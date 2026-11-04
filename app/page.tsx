@@ -11,7 +11,16 @@ type Movie = {
   vote_average?: number;
 };
 
-// Added total_pages to the expected API response
+const LANGUAGES = [
+  { code: 'all', label: 'Global' },
+  { code: 'te', label: 'Telugu' },
+  { code: 'hi', label: 'Hindi' },
+  { code: 'ta', label: 'Tamil' },
+  { code: 'ml', label: 'Malayalam' },
+  { code: 'kn', label: 'Kannada' },
+  { code: 'en', label: 'English' }
+];
+
 async function getMovies(query?: string, lang?: string, page: number = 1): Promise<{ results: Movie[], total_pages: number }> {
   const apiKey = process.env.TMDB_API_KEY || process.env.NEXT_PUBLIC_TMDB_KEY;
   if (!apiKey) throw new Error('Missing TMDB_API_KEY in .env.local');
@@ -20,8 +29,9 @@ async function getMovies(query?: string, lang?: string, page: number = 1): Promi
   
   if (query) {
     url = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${encodeURIComponent(query)}&page=${page}`;
-  } else if (lang === 'te') {
-    url = `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&with_original_language=te&sort_by=popularity.desc&page=${page}`;
+  } else if (lang && lang !== 'all') {
+    // strictly filters to movies originally produced in the selected language
+    url = `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&with_original_language=${lang}&sort_by=popularity.desc&page=${page}`;
   } else {
     url = `https://api.themoviedb.org/3/trending/movie/day?api_key=${apiKey}&page=${page}`;
   }
@@ -34,58 +44,59 @@ async function getMovies(query?: string, lang?: string, page: number = 1): Promi
 export default async function Home({ searchParams }: { searchParams: Promise<{ q?: string; lang?: string; page?: string }> }) {
   const { q, lang, page } = await searchParams;
   const currentPage = Number(page) || 1;
-  const isTelugu = lang === 'te';
+  const currentLang = lang || 'all';
   
   let movies: Movie[] = [];
   let totalPages = 1;
   let errorMsg = '';
 
   try {
-    const data = await getMovies(q, lang, currentPage);
+    const data = await getMovies(q, currentLang, currentPage);
     movies = data.results ?? [];
     totalPages = data.total_pages ?? 1;
   } catch (err) {
     errorMsg = err instanceof Error ? err.message : 'Failed to reach TMDB';
   }
 
-  let heading = 'Trending today';
-  if (q) heading = `Results for \u201C${q}\u201D`;
-  else if (isTelugu) heading = 'Trending Telugu Movies';
+  const heading = q ? `Results for \u201C${q}\u201D` : 'Discover Movies';
 
-  // Helper to generate pagination links while keeping search/lang queries
   const buildPageUrl = (newPage: number) => {
     const params = new URLSearchParams();
     if (q) params.set('q', q);
-    if (lang) params.set('lang', lang);
+    if (currentLang !== 'all') params.set('lang', currentLang);
     params.set('page', newPage.toString());
     return `/?${params.toString()}`;
   };
 
-  // TMDB limits pagination to 500 pages maximum
   const maxPages = totalPages > 500 ? 500 : totalPages;
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-8 sm:px-8">
-      <div className="mb-6 flex items-baseline justify-between gap-4 border-b border-line pb-4">
-        <div className="flex items-center gap-4 flex-wrap">
+      <div className="mb-6 flex flex-col gap-4 border-b border-line pb-6">
+        <div className="flex items-baseline justify-between gap-4">
           <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">{heading}</h1>
-          
-          {!q && (
-            <Link
-              href={isTelugu ? '/' : '/?lang=te'}
-              className={`rounded-ui border px-3 py-1 text-sm font-medium transition-colors ${
-                isTelugu 
-                  ? 'border-leader bg-leader text-ink' 
-                  : 'border-line bg-surface text-leader hover:bg-line/20'
-              }`}
-            >
-              {isTelugu ? 'Show All Languages' : '🇺🇳 Telugu Only'}
-            </Link>
+          {!errorMsg && (
+            <p className="shrink-0 text-sm tabular-nums text-bone/60">{movies.length} titles</p>
           )}
         </div>
         
-        {!errorMsg && (
-          <p className="shrink-0 text-sm tabular-nums text-bone/60">{movies.length} titles</p>
+        {/* Embedded Language Selector Tabs */}
+        {!q && (
+          <div className="flex flex-wrap gap-2">
+            {LANGUAGES.map((l) => (
+              <Link
+                key={l.code}
+                href={l.code === 'all' ? '/' : `/?lang=${l.code}`}
+                className={`rounded-ui border px-4 py-1.5 text-sm font-medium transition-colors ${
+                  currentLang === l.code 
+                    ? 'border-leader bg-leader text-ink' 
+                    : 'border-line bg-surface text-leader hover:bg-line/20'
+                }`}
+              >
+                {l.label}
+              </Link>
+            ))}
+          </div>
         )}
       </div>
 
@@ -100,7 +111,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ q
       ) : movies.length === 0 ? (
         <div className="rounded-ui border border-line bg-panel p-6">
           <p className="font-medium">No titles match your search.</p>
-          <p className="mt-1 text-sm text-bone/60">Check the spelling or try a shorter title.</p>
+          <p className="mt-1 text-sm text-bone/60">Check the spelling or try a different filter.</p>
         </div>
       ) : (
         <>

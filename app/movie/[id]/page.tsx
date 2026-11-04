@@ -1,10 +1,19 @@
 import Link from 'next/link';
 import MagnetPlayer from '../../../components/MagnetPlayer';
+import DownloadOptions from '../../../components/DownloadOptions';
 
 export const dynamic = 'force-dynamic';
 
-export default async function MoviePage({ params }: { params: Promise<{ id: string }> }) {
+export default async function MoviePage({ 
+  params, 
+  searchParams 
+}: { 
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ audio?: string }>; 
+}) {
   const { id: tmdbId } = await params;
+  const { audio } = await searchParams;
+  const targetAudio = audio ? audio.toLowerCase() : '';
   const apiKey = process.env.TMDB_API_KEY || process.env.NEXT_PUBLIC_TMDB_KEY;
 
   let movie: any = null;
@@ -32,9 +41,21 @@ export default async function MoviePage({ params }: { params: Promise<{ id: stri
         cache: 'no-store',
       });
       const torData = await torRes.json();
-      const best =
-        torData.streams?.find((s: any) => /1080p/i.test(s.name || s.title)) ||
-        torData.streams?.[0];
+      let best = null;
+
+      // 1. If a specific language is selected, search Torrentio for a dub
+      if (targetAudio && targetAudio !== 'original') {
+        best = 
+          torData.streams?.find((s: any) => s.title?.toLowerCase().includes(targetAudio) && /1080p/i.test(s.name || s.title)) ||
+          torData.streams?.find((s: any) => s.title?.toLowerCase().includes(targetAudio));
+      }
+
+      // 2. Fallback to the best quality available if the dub isn't found on torrents
+      if (!best) {
+        best =
+          torData.streams?.find((s: any) => /1080p/i.test(s.name || s.title)) ||
+          torData.streams?.[0];
+      }
 
       if (best?.infoHash) {
         const trackers = [
@@ -71,18 +92,29 @@ export default async function MoviePage({ params }: { params: Promise<{ id: stri
               className="w-56 rounded-xl shadow-lg self-start"
             />
           )}
-          <div className="space-y-3">
+          <div className="flex-1 space-y-3">
             <h1 className="text-4xl font-bold">{movie?.title}</h1>
             <p className="text-gray-400 text-sm">
               {movie?.release_date} {movie?.vote_average ? `· ⭐ ${movie.vote_average.toFixed(1)}` : ''}
             </p>
             <p className="text-gray-400 italic">{movie?.tagline}</p>
             <p className="text-gray-300 max-w-2xl leading-relaxed">{movie?.overview}</p>
+            
+            {movie?.title && (
+              <div className="pt-4">
+                <DownloadOptions movieTitle={movie.title} />
+              </div>
+            )}
           </div>
         </div>
       )}
 
-      <MagnetPlayer tmdbId={tmdbId} imdbId={imdbId} magnet={magnet} title={movie?.title || 'Movie'} />
+      <div className="mt-8 border-t border-gray-800 pt-8">
+        <h2 className="text-xl font-semibold mb-4">
+          {audio && audio !== 'Original' ? `Playing: ${audio} (if available)` : 'Or stream via WebTorrent:'}
+        </h2>
+        <MagnetPlayer tmdbId={tmdbId} imdbId={imdbId} magnet={magnet} title={movie?.title || 'Movie'} />
+      </div>
     </div>
   );
 }

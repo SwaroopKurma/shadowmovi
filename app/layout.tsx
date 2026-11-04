@@ -28,13 +28,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${display.variable} ${body.variable}`}>
 	<head>
-	{/* Popunder Ad Zone */}
+  {/* Popunder Ad Zone */}
   <script dangerouslySetInnerHTML={{ __html: `(function(s){s.dataset.zone='12188543',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))` }} />
 
-  <script dangerouslySetInnerHTML={{ __html: `(function(s){s.dataset.zone='12188543',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))` }} />
-  
+  {/* Vignette Banner Ad Zone */}
+  <script dangerouslySetInnerHTML={{ __html: `(function(s){s.dataset.zone='12188646',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))` }} />
+
   <Script src="https://cdn.jsdelivr.net/npm/webtorrent@latest/webtorrent.min.js" strategy="afterInteractive" />
 </head>
+
     <body className="min-h-screen font-body">
         <header className="sticky top-0 z-20 border-b border-line bg-ink">
           <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-8">

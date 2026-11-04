@@ -3,6 +3,7 @@ import { Bricolage_Grotesque, IBM_Plex_Sans } from 'next/font/google';
 import Link from 'next/link';
 import { Suspense } from 'react';
 import './globals.css';
+import Script from 'next/script';
 import SearchBar from '../components/SearchBar';
 
 const display = Bricolage_Grotesque({
@@ -26,10 +27,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${display.variable} ${body.variable}`}>
-      <head>
-        <script src="https://cdn.jsdelivr.net/npm/webtorrent@latest/webtorrent.min.js" defer />
-      </head>
-      <body className="min-h-screen font-body">
+	<head>
+  <Script src="https://a15sn.com/tag.min.js" data-zone="12188543" strategy="afterInteractive" />
+  <Script src="https://cdn.jsdelivr.net/npm/webtorrent@latest/webtorrent.min.js" strategy="afterInteractive" />
+</head>
+    <body className="min-h-screen font-body">
         <header className="sticky top-0 z-20 border-b border-line bg-ink">
           <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-8">
             <Link

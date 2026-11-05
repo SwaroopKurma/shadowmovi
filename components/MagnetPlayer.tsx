@@ -141,15 +141,13 @@ export default function MagnetPlayer({ tmdbId, imdbId, magnet, title }: Props) {
 
       {currentEmbed && (
         <div className="space-y-2">
-          <iframe
-            key={currentEmbed.id}
-            src={currentEmbed.getUrl(tmdbId)}
-            className="w-full aspect-video rounded-lg bg-black border-0"
-            allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-            allowFullScreen
-            referrerPolicy="origin"
-          />
-          <p className="text-xs text-gray-400">
+<iframe
+  key={currentEmbed.id}
+  src={currentEmbed.getUrl(tmdbId)}
+  className="absolute inset-0 w-full h-full border-0"
+  allowFullScreen
+  sandbox="allow-scripts allow-same-origin allow-presentation"
+/>          <p className="text-xs text-gray-400">
             Tip: Click <strong>📥 Download MP4 (External Mirror)</strong> above to open a direct file-search indexer where you can grab pre-rendered MP4/MKV downloads.
           </p>
         </div>

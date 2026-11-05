@@ -9,16 +9,16 @@ interface Props {
   title?: string;
 }
 
-// Cleaned up server list: prioritizing 2Embed and regional-friendly alternatives
+// Cleaned up server list: prioritizing highly reliable 2026 alternatives
 const SERVERS = [
-  { id: '2embed', name: 'Server 1 (2Embed)', getUrl: (tmdb: string) => `https://www.2embed.cc/embed/${tmdb}` },
-  { id: 'yapgrid', name: 'Server 2 (YapGrid)', getUrl: (tmdb: string) => `https://yapgrid.com/embed/movie/${tmdb}` },
-  { id: 'superembed', name: 'Server 3 (SuperEmbed)', getUrl: (tmdb: string) => `https://multiembed.mov/?video_id=${tmdb}&tmdb=1` },
+  { id: 'vidsrc', name: 'Server 1 (VidSrc)', getUrl: (tmdb: string) => `https://vidsrc.me/embed/movie?tmdb=${tmdb}` },
+  { id: 'vidlink', name: 'Server 2 (VidLink)', getUrl: (tmdb: string) => `https://vidlink.pro/movie/${tmdb}` },
+  { id: 'cinesrc', name: 'Server 3 (CineSrc)', getUrl: (tmdb: string) => `https://cinesrc.st/embed/movie/${tmdb}` },
   { id: 'embedsu', name: 'Server 4 (Embed.su)', getUrl: (tmdb: string) => `https://embed.su/embed/movie/${tmdb}` }
 ];
 
 export default function MagnetPlayer({ tmdbId, imdbId, magnet, title }: Props) {
-  // Defaulting to 2Embed
+  // Defaulting to VidSrc (Server 1)
   const [activeServer, setActiveServer] = useState<string>(SERVERS[0].id);
   const [customMagnet, setCustomMagnet] = useState(magnet || '');
   const [status, setStatus] = useState('Ready to stream via WebTorrent.');
